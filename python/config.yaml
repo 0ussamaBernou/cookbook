@@ -1,0 +1,3 @@
+interfaces:
+  fa0/1:
+    switchport: access vlan 100
