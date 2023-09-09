@@ -1,26 +1,26 @@
 # Python CookBook
 
-[x] Hello, world
+[+] Hello, world
 
-[x] Getting user input from stdin
+[+] Getting user input from stdin
 
-[x] Taking command line arguments
+[+] Taking command line arguments
 
-[x] Reading and writing files
+[+] Reading and writing files
 
-[x] Using TCP sockets
+[+] Using TCP sockets
 
-[x] Making HTTP requests
+[+] Making HTTP requests
 
-[x] Parsing JSON
+[+] Parsing JSON
 
-[x] Creating a CSV file
+[+] Creating a CSV file
 
-[x] Making database connections
+[+] Making database connections
 
 [] Playing an audio file
 
-[x] Multithreading
+[+] Multithreading
 
 [] Drawing 2D graphics to screen
 
