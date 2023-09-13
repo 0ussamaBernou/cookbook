@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"math"
 	"math/rand"
+	"runtime"
+	"strings"
+	"time"
 )
 
 func add(x, y int) int { // equivalent to : func add(x int, y int) int {
@@ -38,6 +41,40 @@ const (
 	Small = Big >> 99
 )
 
+func pow(x, n, lim float64) float64 {
+	if v := math.Pow(x, n); v < lim { // if can start with a short statement
+		return v
+	} else {
+		fmt.Printf("%g >= %g\n", v, lim)
+	}
+	// can't use v here, though
+	return lim
+}
+func Sqrt(x float64) float64 {
+	z := 1.0
+	for i := 1; i <= 10; i++ {
+		z -= (z*z - x) / (2 * z)
+		fmt.Println(z)
+	}
+	return z
+}
+func helloworld() {
+	defer fmt.Println("world!") // the execution of this line will be defered until the surrounding function returns
+
+	fmt.Println("Hello")
+}
+
+type Vertex struct {
+	X, Y int
+}
+
+var (
+	v1 = Vertex{1, 2}  // has type Vertex
+	v2 = Vertex{X: 1}  // Y:0 is implicit
+	v3 = Vertex{}      // X:0 and Y:0
+	p  = &Vertex{1, 2} // has type *Vertex
+)
+
 func main() {
 	fmt.Println("My favorite number is:", rand.Intn(10))
 	fmt.Println(math.Pi)
@@ -56,4 +93,77 @@ func main() {
 	var z uint = uint(f)
 	fmt.Println(x, y, z)
 	fmt.Println(needInt(Small))
+	sum := 1
+	for sum < 100 {
+		sum += sum
+	}
+
+	fmt.Println(Sqrt(2))
+	fmt.Println(math.Sqrt(2))
+	fmt.Print("Go runs on ")
+	switch os := runtime.GOOS; os {
+	case "darwin":
+		fmt.Println("OS X.")
+	case "linux":
+		fmt.Println("Linux.")
+	default:
+		// freebsd, openbsd,
+		// plan9, windows...
+		fmt.Printf("%s.\n", os)
+	}
+
+	t := time.Now()
+	switch {
+	case t.Hour() < 12:
+		fmt.Println("Good morning!")
+	case t.Hour() < 17:
+		fmt.Println("Good afternoon.")
+	default:
+		fmt.Println("Good evening.")
+	}
+
+	helloworld()
+
+	fmt.Println("counting")
+
+	for i := 0; i < 10; i++ {
+		defer fmt.Println(i)
+	}
+
+	fmt.Println("done")
+
+	i, j := 42, 2701
+
+	p := &i         // point to i
+	fmt.Println(*p) // read i through the pointer
+	*p = 21         // set i through the pointer
+	fmt.Println(i)  // see the new value of i
+
+	p = &j         // point to j
+	*p = *p / 37   // divide j through the pointer
+	fmt.Println(j) // see the new value of j
+
+	fmt.Println(v1, p, v2, v3)
+	primes := [6]int{2, 3, 5, 7, 11, 13} // array
+
+	var s []int = primes[1:4] // slice
+	s[0] = 17
+	fmt.Println(s, primes)
+	// Create a tic-tac-toe board.
+	board := [][]string{
+		{"_", "_", "_"},
+		{"_", "_", "_"},
+		{"_", "_", "_"},
+	}
+
+	// The players take turns.
+	board[0][0] = "X"
+	board[2][2] = "O"
+	board[1][2] = "X"
+	board[1][0] = "O"
+	board[0][2] = "X"
+
+	for i := 0; i < len(board); i++ {
+		fmt.Printf("%s\n", strings.Join(board[i], " "))
+	}
 }
