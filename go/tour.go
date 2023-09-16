@@ -75,6 +75,34 @@ var (
 	p  = &Vertex{1, 2} // has type *Vertex
 )
 
+var pows = []int{1, 2, 4, 8, 16, 32, 64, 128}
+
+type Coord struct {
+	Lat, Long float64
+}
+
+var m map[string]Coord
+
+var m2 = map[string]Coord{
+	"Google": {
+		37.42202, -122.08408,
+	},
+}
+
+// function as value
+func compute(fn func(float64, float64) float64) float64 {
+	return fn(3, 4)
+}
+
+// function closures
+func adder() func(int) int {
+	sum := 0
+	return func(x int) int {
+		sum += x
+		return sum
+	}
+}
+
 func main() {
 	fmt.Println("My favorite number is:", rand.Intn(10))
 	fmt.Println(math.Pi)
@@ -166,4 +194,22 @@ func main() {
 	for i := 0; i < len(board); i++ {
 		fmt.Printf("%s\n", strings.Join(board[i], " "))
 	}
+	for i, v := range pows {
+		fmt.Printf("2**%d = %d\n", i, v)
+	}
+	// maps
+	m = make(map[string]Coord)
+	m["Bell Labs"] = Coord{
+		40.68433, -74.39967,
+	}
+	fmt.Println(m["Bell Labs"])
+
+	//functions as values
+	hypot := func(x, y float64) float64 {
+		return math.Sqrt(x*x + y*y)
+	}
+	fmt.Println(hypot(5, 12))
+
+	fmt.Println(compute(hypot))
+	fmt.Println(compute(math.Pow))
 }

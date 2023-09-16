@@ -176,3 +176,275 @@ b := make([]int, 0, 5) // len(b)=0, cap(b)=5
 b = b[:cap(b)] // len(b)=5, cap(b)=5
 b = b[1:]      // len(b)=4, cap(b)=4
 ```
+
+### Append to slice
+
+```go
+func append(s []T, vs ...T) []T
+```
+
+The first parameter s of append is a slice of type T, and the rest are T values to append to the slice.
+
+## Range
+
+You can skip the index or value by assigning to \_.
+
+```go
+for i, _ := range pow
+for _, value := range pow
+```
+
+If you only want the index, you can omit the second variable.
+
+```go
+for i := range pow
+```
+
+### Maps
+
+A map maps keys to values.
+
+The zero value of a map is nil. A nil map has no keys, nor can keys be added.
+
+The make function returns a map of the given type, initialized and ready for use.
+
+### Mutating Maps
+
+Insert or update an element in map m:
+
+```go
+m[key] = elem
+```
+
+Retrieve an element:
+
+```go
+elem = m[key]
+```
+
+Delete an element:
+
+```go
+delete(m, key)
+```
+
+Test that a key is present with a two-value assignment:
+
+```go
+elem, ok = m[key]
+```
+
+If key is in m, ok is true. If not, ok is false.
+
+If key is not in the map, then elem is the zero value for the map's element type.
+
+Note: If elem or ok have not yet been declared you could use a short declaration form:
+
+```go
+elem, ok := m[key]
+```
+
+### Methods are functions
+
+Remember: a method is just a function with a receiver argument.
+
+You can declare a method on non-struct types, too.
+
+In this example we see a numeric type MyFloat with an Abs method.
+
+You can only declare a method with a receiver whose type is defined in the same package as the method. You cannot declare a method with a receiver whose type is defined in another package (which includes the built-in types such as int).
+
+### Pointer receivers
+
+You can declare methods with pointer receivers.
+
+This means the receiver type has the literal syntax *T for some type T. (Also, T cannot itself be a pointer such as *int.)
+
+For example, the Scale method here is defined on \*Vertex.
+
+Methods with pointer receivers can modify the value to which the receiver points (as Scale does here). Since methods often need to modify their receiver, pointer receivers are more common than value receivers.
+
+With a value receiver, the Scale method operates on a copy of the original Vertex value. (This is the same behavior as for any other function argument.) The Scale method must have a pointer receiver to change the Vertex value declared in the main function.
+
+### Choosing a value or pointer receiver
+
+There are two reasons to use a pointer receiver.
+
+The first is so that the method can modify the value that its receiver points to.
+
+The second is to avoid copying the value on each method call. This can be more efficient if the receiver is a large struct, for example.
+
+In this example, both Scale and Abs are methods with receiver type \*Vertex, even though the Abs method needn't modify its receiver.
+
+In general, all methods on a given type should have either value or pointer receivers, but not a mixture of both. (We'll see why over the next few pages.)
+
+```go
+
+package main
+
+import (
+	"fmt"
+	"math"
+)
+
+type Vertex struct {
+	X, Y float64
+}
+
+func (v *Vertex) Scale(f float64) {
+	v.X = v.X * f
+	v.Y = v.Y * f
+}
+
+func (v *Vertex) Abs() float64 {
+	return math.Sqrt(v.X*v.X + v.Y*v.Y)
+}
+
+func main() {
+	v := &Vertex{3, 4}
+	fmt.Printf("Before scaling: %+v, Abs: %v\n", v, v.Abs())
+	v.Scale(5)
+	fmt.Printf("After scaling: %+v, Abs: %v\n", v, v.Abs())
+}
+```
+
+## Interfaces
+
+An interface type is defined as a set of method signatures.
+
+A value of interface type can hold any value that implements those methods.
+
+### Interfaces are implemented implicitly
+
+A type implements an interface by implementing its methods. There is no explicit declaration of intent, no "implements" keyword.
+
+Implicit interfaces decouple the definition of an interface from its implementation, which could then appear in any package without prearrangement.
+
+### Interface values
+
+Under the hood, interface values can be thought of as a tuple of a value and a concrete type:
+
+```go
+(value, type)
+```
+
+An interface value holds a value of a specific underlying concrete type.
+
+Calling a method on an interface value executes the method of the same name on its underlying type.
+
+### The empty interface
+
+The interface type that specifies zero methods is known as the empty interface:
+
+interface{}
+
+An empty interface may hold values of any type. (Every type implements at least zero methods.)
+
+Empty interfaces are used by code that handles values of unknown type. For example, fmt.Print takes any number of arguments of type interface{}.
+
+### Type assertions
+
+A type assertion provides access to an interface value's underlying concrete value.
+
+```go
+t := i.(T)
+```
+
+This statement asserts that the interface value i holds the concrete type T and assigns the underlying T value to the variable t.
+
+If i does not hold a T, the statement will trigger a panic.
+
+To test whether an interface value holds a specific type, a type assertion can return two values: the underlying value and a boolean value that reports whether the assertion succeeded.
+
+```go
+t, ok := i.(T)
+```
+
+If i holds a T, then t will be the underlying value and ok will be true.
+
+If not, ok will be false and t will be the zero value of type T, and no panic occurs.
+
+Note the similarity between this syntax and that of reading from a map.
+
+```go
+
+package main
+
+import "fmt"
+
+func main() {
+	var i interface{} = "hello"
+
+	s := i.(string)
+	fmt.Println(s)
+
+	s, ok := i.(string)
+	fmt.Println(s, ok)
+
+	f, ok := i.(float64)
+	fmt.Println(f, ok)
+
+	f = i.(float64) // panic
+	fmt.Println(f)
+}
+```
+
+### Type switches
+
+A type switch is a construct that permits several type assertions in series.
+
+A type switch is like a regular switch statement, but the cases in a type switch specify types (not values), and those values are compared against the type of the value held by the given interface value.
+
+```go
+switch v := i.(type) {
+case T:
+    // here v has type T
+case S:
+    // here v has type S
+default:
+    // no match; here v has the same type as i
+}
+```
+
+The declaration in a type switch has the same syntax as a type assertion i.(T), but the specific type T is replaced with the keyword type.
+
+This switch statement tests whether the interface value i holds a value of type T or S. In each of the T and S cases, the variable v will be of type T or S respectively and hold the value held by i. In the default case (where there is no match), the variable v is of the same interface type and value as i.
+
+### Stringers
+
+One of the most ubiquitous interfaces is Stringer defined by the fmt package.
+
+```go
+type Stringer interface {
+    String() string
+}
+```
+
+A Stringer is a type that can describe itself as a string. The fmt package (and many others) look for this interface to print values.
+
+## Errors
+
+Go programs express error state with error values.
+
+The error type is a built-in interface similar to fmt.Stringer:
+
+```go
+type error interface {
+    Error() string
+}
+```
+
+(As with fmt.Stringer, the fmt package looks for the error interface when printing values.)
+
+Functions often return an error value, and calling code should handle errors by testing whether the error equals nil.
+
+```go
+i, err := strconv.Atoi("42")
+if err != nil {
+fmt.Printf("couldn't convert number: %v\n", err)
+return
+}
+fmt.Println("Converted integer:", i)
+```
+
+A nil error denotes success; a non-nil error denotes failure.
