@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-const apiKey = "62037415837c13af5a1ceb8367e3514c"
+const apiKey = ""
 
 func fetchWeather(city string, ch chan<- string, wg *sync.WaitGroup) interface{} {
 	var data struct {
